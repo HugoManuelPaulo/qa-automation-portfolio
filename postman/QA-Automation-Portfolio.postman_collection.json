@@ -1,0 +1,40 @@
+{
+  "info": {
+    "name": "QA Automation Portfolio API",
+    "description": "Postman checks for the deterministic users API included in this repository.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://127.0.0.1:8000" }
+  ],
+  "item": [
+    {
+      "name": "List users",
+      "request": { "method": "GET", "url": "{{base_url}}/api/users" },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+          "pm.test('Response contains two users', () => pm.expect(pm.response.json().count).to.eql(2));"
+        ]}
+      }]
+    },
+    {
+      "name": "Create user",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Hugo Paulo\",\n  \"role\": \"QA Automation Engineer\"\n}" },
+        "url": "{{base_url}}/api/users"
+      },
+      "event": [{
+        "listen": "test",
+        "script": { "exec": [
+          "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+          "pm.test('Created user has an id', () => pm.expect(pm.response.json().id).to.eql(3));"
+        ]}
+      }]
+    }
+  ]
+}
+
