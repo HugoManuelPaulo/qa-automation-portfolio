@@ -48,9 +48,12 @@ class StorePage:
 
     def set_quantity(self, product_id, quantity):
         field = self.driver.find_element(By.CSS_SELECTOR, f'[data-cart-id="{product_id}"] input')
-        field.clear()
-        field.send_keys(str(quantity))
-        field.send_keys("\ue007")
+        self.driver.execute_script(
+            "arguments[0].value = arguments[1]; "
+            "arguments[0].dispatchEvent(new Event('change', {bubbles: true}));",
+            field,
+            str(quantity),
+        )
         return self
 
     def checkout(self, name, email, address):

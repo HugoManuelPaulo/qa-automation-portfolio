@@ -70,10 +70,14 @@ class DemoHandler(SimpleHTTPRequestHandler):
             if not all(customer.get(key) for key in ("name", "email", "address")) or not items:
                 return self._json(422, {"error": "customer and items are required"})
             try:
-                total = sum(next(p["price"] for p in PRODUCTS if p["id"] == item["product_id"]) * int(item["quantity"]) for item in items)
-                if any(int(item["quantity"]) < 1 for item in items):
-                    raise ValueError
-            except (StopIteration, KeyError, TypeError, ValueError):
+                total = 0
+                for item in items:
+                    product = next((p for p in PRODUCTS if p["id"] == item["product_id"]), None)
+                    quantity = int(item["quantity"])
+                    if product is None or quantity < 1:
+                        raise ValueError
+                    total += product["price"] * quantity
+            except (KeyError, TypeError, ValueError):
                 return self._json(422, {"error": "Invalid order item"})
             return self._json(201, {"order_id": "QC-2026-001", "status": "confirmed", "total": round(total, 2)})
         return self._json(404, {"error": "Route not found"})
