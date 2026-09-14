@@ -1,58 +1,63 @@
-# QA Automation Portfolio
+# QualityCart — E-commerce QA Automation
 
 [![Automated QA Tests](https://github.com/HugoManuelPaulo/qa-automation-portfolio/actions/workflows/tests.yml/badge.svg)](https://github.com/HugoManuelPaulo/qa-automation-portfolio/actions/workflows/tests.yml)
 
-A compact, deterministic QA automation project demonstrating browser testing, API validation, maintainable test design and CI reporting.
+A portfolio-grade QA automation framework for a deterministic e-commerce application. It demonstrates browser journeys, API contracts, maintainable test architecture and CI evidence without depending on unstable third-party demo sites.
 
-## What this project demonstrates
+## Business risks covered
 
-- UI automation with **Selenium WebDriver** and the **Page Object Model**
-- API functional and contract checks with **Requests** and **PyTest**
-- Positive, negative and validation scenarios
-- Test categorization with `api` and `ui` markers
-- Automated execution in **GitHub Actions**
-- A downloadable self-contained HTML test report
-- A **Postman** collection with response assertions
-
-The application and API under test run locally during the test session. This keeps the suite reliable and avoids failures caused by unavailable third-party demo services.
-
-## Test coverage
-
-| Layer | Scenarios |
+| Area | Automated scenarios |
 | --- | --- |
-| UI | Successful login, invalid credentials, required-field validation |
-| API | List users, retrieve user, missing resource, valid creation, payload validation |
+| Authentication | Successful login, invalid credentials, required-field validation |
+| Product discovery | Catalog rendering, keyword/category search, empty results |
+| Cart | Add product, item count, quantity changes, price recalculation |
+| Checkout | Customer journey and order confirmation |
+| Product API | List, filter, retrieve and missing-resource behavior |
+| Order API | Creation, server-side totals and invalid payload rejection |
+| User API | Read/create contracts and negative validation |
 
-## Project structure
+## Engineering approach
 
-```text
-app/                 Local browser test fixture
-pages/               Selenium page objects
-tests/api/           API behavior and contract tests
-tests/ui/            Browser-based user-journey tests
-postman/             Importable Postman collection
-.github/workflows/   Continuous integration pipeline
-```
+- **Python, Selenium WebDriver and PyTest**
+- **Page Object Model** separating browser actions from assertions
+- API functional, negative and contract checks with **Requests**
+- Data-driven validation using pytest.mark.parametrize
+- Stable data-testid selectors and explicit waits
+- Automatic screenshots when UI tests fail
+- Self-contained HTML report on every CI run
+- GitHub Actions execution on pushes and pull requests
+- Importable Postman collection with response assertions
+
+## Structure
+
+    app/                  Deterministic e-commerce application and API fixture
+    pages/                Page Object Model classes
+    tests/ui/             End-to-end browser journeys
+    tests/api/            API contract and behavior tests
+    postman/              Postman API collection
+    .github/workflows/    Continuous integration pipeline
 
 ## Run locally
 
 Requirements: Python 3.11+ and Google Chrome.
 
-```bash
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-pytest -v --html=report.html --self-contained-html
-```
+    python -m venv .venv
+    source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
+    pip install -r requirements.txt
+    pytest -v --html=report.html --self-contained-html
 
-Run only one layer:
+Run a test layer independently:
 
-```bash
-pytest -m api -v
-pytest -m ui -v
-```
+    pytest -m api -v
+    pytest -m ui -v
 
-## Quality approach
+## CI evidence
 
-The suite separates browser actions from assertions, uses explicit waits instead of fixed sleeps, validates status codes and response contracts, and produces evidence on every CI run. The tests are intentionally self-contained so failures point to product behavior rather than an unstable external dependency.
+Every push runs the complete API and browser suite in headless Chrome. GitHub Actions retains the HTML report and any failure screenshots as downloadable artifacts, making results auditable by reviewers.
 
+## Test credentials
+
+    Email: demo@example.com
+    Password: Quality123
+
+This project was designed and implemented as a practical demonstration of QA automation, risk-based coverage and maintainable test engineering.

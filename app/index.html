@@ -3,42 +3,102 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>QA Test Fixture</title>
+  <title>QualityCart Test Store</title>
   <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #081321; color: #f4f7fb; font: 16px/1.5 system-ui, sans-serif; }
-    main { width: min(calc(100% - 32px), 420px); padding: 32px; background: #102035; border: 1px solid #29435f; border-radius: 16px; }
-    h1 { margin: 0 0 8px; }
-    p { color: #a9bacd; }
-    label { display: grid; gap: 6px; margin-top: 16px; font-weight: 700; }
-    input, button { min-height: 46px; border-radius: 8px; font: inherit; }
-    input { padding: 10px 12px; color: #f4f7fb; background: #081321; border: 1px solid #38536f; }
-    button { width: 100%; margin-top: 22px; border: 0; background: #66a6ff; color: #04101e; font-weight: 800; cursor: pointer; }
-    #message { min-height: 24px; margin-bottom: 0; color: #69ddb0; }
+    *{box-sizing:border-box} body{margin:0;background:#07111f;color:#edf4ff;font:16px/1.5 system-ui,sans-serif}
+    header{display:flex;justify-content:space-between;align-items:center;padding:18px max(24px,6vw);background:#0d1c30;border-bottom:1px solid #29435f}
+    header strong{font-size:22px;color:#6eb4ff}.badge{padding:7px 12px;background:#183354;border-radius:999px}
+    main{width:min(1100px,calc(100% - 32px));margin:28px auto}.panel{padding:24px;background:#102035;border:1px solid #29435f;border-radius:16px}
+    #login-panel{max-width:440px;margin:70px auto}h1,h2,h3{margin-top:0}p{color:#afbed0}
+    label{display:grid;gap:6px;margin-top:14px;font-weight:700}input,button{min-height:44px;border-radius:8px;font:inherit}
+    input{padding:9px 11px;color:#edf4ff;background:#07111f;border:1px solid #42607d}button{border:0;padding:10px 16px;background:#69adff;color:#04101e;font-weight:800;cursor:pointer}
+    #login-button{width:100%;margin-top:20px}.success{color:#64deb0}.error{color:#ff8f9b}
+    #store{display:none}.toolbar{display:flex;gap:14px;align-items:end;margin-bottom:22px}.toolbar label{flex:1;margin:0}
+    .layout{display:grid;grid-template-columns:2fr 1fr;gap:22px}.products{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+    .product{padding:18px;background:#102035;border:1px solid #29435f;border-radius:14px}.product p{min-height:48px}.price{display:block;font-size:20px;font-weight:800;color:#69adff;margin-bottom:12px}
+    .cart-item{display:grid;grid-template-columns:1fr 70px;gap:8px;align-items:center;padding:12px 0;border-bottom:1px solid #29435f}
+    .cart-item input{width:64px}.total{font-size:22px;font-weight:800}.empty{color:#afbed0}.checkout{width:100%;margin-top:12px}
+    #checkout-panel{display:none;margin-top:22px}#confirmation{display:none;margin-top:18px;padding:18px;background:#10372e;border-radius:12px}
+    @media(max-width:760px){.layout{grid-template-columns:1fr}.products{grid-template-columns:1fr}.toolbar{display:block}.toolbar button{margin-top:12px}}
   </style>
 </head>
 <body>
-  <main>
-    <h1>QA Demo Login</h1>
-    <p>Deterministic test fixture for browser automation.</p>
+<header><strong>QualityCart</strong><span id="cart-badge" class="badge">Cart: 0</span></header>
+<main>
+  <section id="login-panel" class="panel">
+    <h1>Test Store Login</h1><p>Sign in to access the deterministic e-commerce test fixture.</p>
     <form id="login-form">
-      <label>Email<input id="email" name="email" type="email" autocomplete="username" required></label>
-      <label>Password<input id="password" name="password" type="password" autocomplete="current-password" required></label>
+      <label>Email<input id="email" type="email" required></label>
+      <label>Password<input id="password" type="password" required></label>
       <button id="login-button" type="submit">Sign in</button>
-      <p id="message" role="status" aria-live="polite"></p>
+      <p id="message" role="status"></p>
     </form>
-  </main>
-  <script>
-    document.getElementById('login-form').addEventListener('submit', function (event) {
-      event.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      document.getElementById('message').textContent =
-        email === 'demo@example.com' && password === 'Quality123'
-          ? 'Welcome, QA Engineer.'
-          : 'Invalid email or password.';
-    });
-  </script>
+  </section>
+  <section id="store">
+    <div class="toolbar panel">
+      <label>Search products<input id="search" type="search" placeholder="e.g. keyboard"></label>
+      <button id="clear-search" type="button">Clear</button>
+    </div>
+    <div class="layout">
+      <section><h2>Products</h2><div id="products" class="products"></div><p id="no-results" hidden>No products found.</p></section>
+      <aside class="panel"><h2>Your cart</h2><div id="cart"></div><p class="total">Total: €<span id="cart-total">0.00</span></p><button id="checkout-button" class="checkout" disabled>Checkout</button></aside>
+    </div>
+    <section id="checkout-panel" class="panel">
+      <h2>Checkout</h2>
+      <form id="checkout-form">
+        <label>Full name<input id="customer-name" required></label>
+        <label>Email<input id="customer-email" type="email" required></label>
+        <label>Shipping address<input id="customer-address" required></label>
+        <button id="place-order" type="submit">Place order</button>
+      </form>
+    </section>
+    <section id="confirmation" role="status"><h2>Order confirmed</h2><p id="order-reference"></p></section>
+  </section>
+</main>
+<script>
+const products=[
+  {id:1,name:'Mechanical Keyboard',category:'Accessories',price:89.99,description:'Tactile keyboard for focused work.'},
+  {id:2,name:'Wireless Mouse',category:'Accessories',price:39.50,description:'Ergonomic mouse with silent clicks.'},
+  {id:3,name:'USB-C Dock',category:'Connectivity',price:74.00,description:'Seven-port dock for modern laptops.'},
+  {id:4,name:'QA Handbook',category:'Books',price:24.90,description:'Practical software testing reference.'}
+];
+const cart={};
+const money=value=>value.toFixed(2);
+function renderProducts(query=''){
+  const filtered=products.filter(p=>(p.name+' '+p.category).toLowerCase().includes(query.toLowerCase()));
+  document.getElementById('products').innerHTML=filtered.map(p =>
+    '<article class="product" data-product-id="'+p.id+'"><h3>'+p.name+'</h3><p>'+p.description+'</p><span class="price">€'+money(p.price)+'</span><button data-testid="add-'+p.id+'" onclick="addToCart('+p.id+')">Add to cart</button></article>'
+  ).join('');
+  document.getElementById('no-results').hidden=filtered.length!==0;
+}
+function addToCart(id){cart[id]=(cart[id]||0)+1;renderCart()}
+function updateQuantity(id,value){const quantity=Number(value);if(quantity<1)delete cart[id];else cart[id]=quantity;renderCart()}
+function renderCart(){
+  const entries=Object.entries(cart);
+  document.getElementById('cart').innerHTML=entries.length?entries.map(([id,qty])=>{
+    const p=products.find(item=>item.id===Number(id));
+    return '<div class="cart-item" data-cart-id="'+id+'"><span>'+p.name+'</span><input aria-label="'+p.name+' quantity" type="number" min="0" value="'+qty+'" onchange="updateQuantity('+id+',this.value)"></div>';
+  }).join(''):'<p class="empty">Your cart is empty.</p>';
+  const count=entries.reduce((sum,[,qty])=>sum+qty,0);
+  const total=entries.reduce((sum,[id,qty])=>sum+products.find(p=>p.id===Number(id)).price*qty,0);
+  document.getElementById('cart-badge').textContent='Cart: '+count;
+  document.getElementById('cart-total').textContent=money(total);
+  document.getElementById('checkout-button').disabled=count===0;
+}
+document.getElementById('login-form').addEventListener('submit',event=>{
+  event.preventDefault();
+  const valid=document.getElementById('email').value==='demo@example.com'&&document.getElementById('password').value==='Quality123';
+  const message=document.getElementById('message');message.textContent=valid?'Welcome, QA Engineer.':'Invalid email or password.';
+  message.className=valid?'success':'error';
+  if(valid){document.getElementById('store').style.display='block';renderProducts();renderCart()}
+});
+document.getElementById('search').addEventListener('input',event=>renderProducts(event.target.value));
+document.getElementById('clear-search').addEventListener('click',()=>{document.getElementById('search').value='';renderProducts()});
+document.getElementById('checkout-button').addEventListener('click',()=>document.getElementById('checkout-panel').style.display='block');
+document.getElementById('checkout-form').addEventListener('submit',event=>{
+  event.preventDefault();document.getElementById('confirmation').style.display='block';
+  document.getElementById('order-reference').textContent='Reference: QC-2026-001';
+});
+</script>
 </body>
 </html>
-

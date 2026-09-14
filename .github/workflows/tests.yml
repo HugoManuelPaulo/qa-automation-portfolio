@@ -1,38 +1,32 @@
 name: Automated QA Tests
-
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
-
 permissions:
   contents: read
-
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
-
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
           python-version: "3.13"
           cache: pip
-
       - name: Install dependencies
         run: pip install -r requirements.txt
-
-      - name: Run API and UI tests
+      - name: Run API and e-commerce UI tests
         run: pytest -v --html=report.html --self-contained-html
-
-      - name: Upload HTML test report
+      - name: Upload test evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: qa-test-report
-          path: report.html
-          if-no-files-found: error
-
+          name: qualitycart-test-evidence
+          path: |
+            report.html
+            screenshots/
+          if-no-files-found: warn
