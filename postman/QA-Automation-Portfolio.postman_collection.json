@@ -1,40 +1,105 @@
 {
   "info": {
-    "name": "QA Automation Portfolio API",
-    "description": "Postman checks for the deterministic users API included in this repository.",
+    "name": "QualityCart E-commerce API",
+    "description": "Postman checks for product discovery and order creation in the deterministic QualityCart API.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "http://127.0.0.1:8000" }
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    }
   ],
   "item": [
     {
-      "name": "List users",
-      "request": { "method": "GET", "url": "{{base_url}}/api/users" },
-      "event": [{
-        "listen": "test",
-        "script": { "exec": [
-          "pm.test('Status is 200', () => pm.response.to.have.status(200));",
-          "pm.test('Response contains two users', () => pm.expect(pm.response.json().count).to.eql(2));"
-        ]}
-      }]
+      "name": "List products",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/products"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+              "pm.test('Product contract is valid', () => { const body = pm.response.json(); pm.expect(body.count).to.eql(4); pm.expect(body.data[0]).to.have.all.keys('id', 'name', 'category', 'price'); });"
+            ]
+          }
+        }
+      ]
     },
     {
-      "name": "Create user",
+      "name": "Filter accessories",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/products?q=accessories"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Filter returns two products', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().count).to.eql(2); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create order",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{\n  \"name\": \"Hugo Paulo\",\n  \"role\": \"QA Automation Engineer\"\n}" },
-        "url": "{{base_url}}/api/users"
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer\": {\n    \"name\": \"Hugo Paulo\",\n    \"email\": \"hugo@example.com\",\n    \"address\": \"Purmerend\"\n  },\n  \"items\": [\n    {\n      \"product_id\": 1,\n      \"quantity\": 2\n    }\n  ]\n}"
+        },
+        "url": "{{base_url}}/api/orders"
       },
-      "event": [{
-        "listen": "test",
-        "script": { "exec": [
-          "pm.test('Status is 201', () => pm.response.to.have.status(201));",
-          "pm.test('Created user has an id', () => pm.expect(pm.response.json().id).to.eql(3));"
-        ]}
-      }]
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Order is created', () => pm.response.to.have.status(201));",
+              "pm.test('Total is calculated by API', () => { const body = pm.response.json(); pm.expect(body.status).to.eql('confirmed'); pm.expect(body.total).to.eql(179.98); });"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject empty order",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer\": {\n    \"name\": \"Hugo Paulo\",\n    \"email\": \"hugo@example.com\",\n    \"address\": \"Purmerend\"\n  },\n  \"items\": []\n}"
+        },
+        "url": "{{base_url}}/api/orders"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Invalid order is rejected', () => pm.response.to.have.status(422));"
+            ]
+          }
+        }
+      ]
     }
   ]
 }
-
